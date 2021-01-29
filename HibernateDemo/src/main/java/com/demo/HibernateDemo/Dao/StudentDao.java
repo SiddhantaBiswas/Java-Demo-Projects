@@ -5,12 +5,14 @@ import java.util.List;
 import com.demo.HibernateDemo.POJO.Student;
 
 public interface StudentDao {
-	boolean addStudent(Student student);
+	void addStudent(Student student);
 
-	boolean updateStudent(Student student);
+	void updateStudent(Student student);
 
-	boolean deleteStudent(Student student);
+	void deleteStudent(Student student);
 
 	List<Student> getAllStudents();
+
+	Student getStudentById(int id);
 	
 }

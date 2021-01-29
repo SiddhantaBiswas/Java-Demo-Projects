@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import com.demo.HibernateDemo.Dao.CourseDao;
 import com.demo.HibernateDemo.Dao.CourseDaoImpl;
@@ -22,11 +21,19 @@ public class App {
 	public static void main(String[] args) throws IOException {
 		System.out.println("Hello World!");
 
+		/*
+		 * Reading image file and storing it in a byte[] array. This image will be
+		 * stored in DB as blob object.
+		 */
+		
 		FileInputStream file = new FileInputStream("src/main/java/image.jpg");
 		byte[] image = new byte[file.available()];
 		file.read(image);
-
 		file.close();
+
+		/*
+		 * Create student and course objects to be pushed to DB.
+		 */
 
 		Student s1 = new Student(12, "Siddhanta", "Biswas", "sid@123.com", new Date(), image,
 				new StudentAddress("Asansol", "India"));
@@ -49,27 +56,42 @@ public class App {
 		c1.setStudents(students);
 		c2.setStudents(students);
 
-		SessionProvider provider = new SessionProvider();
-		SessionFactory factory = provider.getSessionFactory();
-
 		/*
-		StudentDao sdao = new StudentDaoImpl(factory);
+		 * Creating a new session for the first transaction. First transaction involves
+		 * pushing newly created Student and Courses object onto DB. SessionProvider
+		 * class creates a new Session object which can be accessed with getSession().
+		 * SessionProvider.getSession() returns the Session object created. This Session
+		 * object is passed to DAO methods for ORM operations.
+		 */
+
+		SessionProvider session = new SessionProvider();
+
+		StudentDao sdao = new StudentDaoImpl(session.getSession());
+		session.beginTransaction();
 		sdao.addStudent(s1);
 		sdao.addStudent(s2);
-		CourseDao cdao = new CourseDaoImpl(factory);
+
+		CourseDao cdao = new CourseDaoImpl(session.getSession());
+		session.beginTransaction();
 		cdao.addCourse(c1);
 		cdao.addCourse(c2);
-		*/
-		
-		Session session = factory.getCurrentSession();
+
+		System.out.println(session.commitTransaction());
+		session.closeSession();
+
+		/*
+		 * After each operation, commit needs to be called for the data to be persisted
+		 * into DB After each commit the present Session object needs to be closed. As
+		 * Session isn't thread safe, so, doing multiple commit() operations in one
+		 * instance of Session will cause IllegaStateException error. Thus we need to
+		 * close Session after each commit and create a new Session for new transactions
+		 */
+
+		StudentDao sdao2 = new StudentDaoImpl(session.getSession());
 		session.beginTransaction();
-		session.save(s1);
-		session.save(s2);
-		session.save(c1);
-		session.save(c2);
-		session.getTransaction().commit();
-		session.close();
-		
-		provider.closeSession();
+		Student s = sdao2.getStudentById(2);
+		session.commitTransaction();
+		System.out.println(s.getFirst_name());
+		session.closeSession();
 	}
 }

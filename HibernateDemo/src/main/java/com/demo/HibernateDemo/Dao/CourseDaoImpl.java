@@ -8,70 +8,42 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import com.demo.HibernateDemo.POJO.Course;
 
 public class CourseDaoImpl implements CourseDao {
 
-	private SessionFactory factory;
+	private Session session;
 
-	public CourseDaoImpl(SessionFactory factory) {
+	public CourseDaoImpl(Session session) {
 		super();
-		this.factory = factory;
+		this.session = session;
 	}
 
 	@Override
-	public boolean addCourse(Course course) {
+	public void addCourse(Course course) {
 		// TODO Auto-generated method stub
 
-		Session session = factory.getCurrentSession();
-
-		session.beginTransaction();
 		session.save(course);
-		session.getTransaction().commit();
-		boolean status = session.getTransaction().getStatus() == TransactionStatus.COMMITTED;
-		session.close();
-
-		return status;
 	}
 
 	@Override
-	public boolean updateCourse(Course course) {
+	public void updateCourse(Course course) {
 		// TODO Auto-generated method stub
 
-		Session session = factory.getCurrentSession();
-
-		session.beginTransaction();
 		session.saveOrUpdate(course);
-		session.getTransaction().commit();
-		boolean status = session.getTransaction().getStatus() == TransactionStatus.COMMITTED;
-		session.close();
-
-		return status;
 	}
 
 	@Override
-	public boolean deleteCourse(Course course) {
+	public void deleteCourse(Course course) {
 		// TODO Auto-generated method stub
 
-		Session session = factory.getCurrentSession();
-
-		session.beginTransaction();
 		session.delete(course);
-		session.getTransaction().commit();
-		boolean status = session.getTransaction().getStatus() == TransactionStatus.COMMITTED;
-		session.close();
-
-		return status;
 	}
 
 	@Override
 	public List<Course> getAllCourses() {
 		// TODO Auto-generated method stub
-
-		Session session = factory.getCurrentSession();
 
 		session.beginTransaction();
 

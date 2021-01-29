@@ -8,73 +8,42 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import com.demo.HibernateDemo.POJO.Student;
 
 public class StudentDaoImpl implements StudentDao {
 
-	private SessionFactory factory;
+	private Session session;
 
-	public StudentDaoImpl(SessionFactory factory) {
+	public StudentDaoImpl(Session session) {
 		super();
-		this.factory = factory;
+		this.session = session;
 	}
 
 	@Override
-	public boolean addStudent(Student student) {
+	public void addStudent(Student student) {
 		// TODO Auto-generated method stub
 
-		Session session = factory.getCurrentSession();
-
-		session.beginTransaction();
 		session.save(student);
-		session.getTransaction().commit();
-		boolean status = session.getTransaction().getStatus() == TransactionStatus.COMMITTED;
-		session.close();
-
-		return status;
 	}
 
 	@Override
-	public boolean updateStudent(Student student) {
+	public void updateStudent(Student student) {
 		// TODO Auto-generated method stub
 
-		Session session = factory.getCurrentSession();
-
-		session.beginTransaction();
 		session.saveOrUpdate(student);
-		session.getTransaction().commit();
-		boolean status = session.getTransaction().getStatus() == TransactionStatus.COMMITTED;
-		session.close();
-
-		return status;
 	}
 
 	@Override
-	public boolean deleteStudent(Student student) {
+	public void deleteStudent(Student student) {
 		// TODO Auto-generated method stub
 
-		Session session = factory.getCurrentSession();
-
-		session.beginTransaction();
 		session.delete(student);
-		session.getTransaction().commit();
-		boolean status = session.getTransaction().getStatus() == TransactionStatus.COMMITTED;
-		session.close();
-
-		return status;
-
 	}
 
 	@Override
 	public List<Student> getAllStudents() {
 		// TODO Auto-generated method stub
-		
-		Session session = factory.getCurrentSession();
-
-		session.beginTransaction();
 		
 		CriteriaBuilder cb = session.getCriteriaBuilder();
 	    CriteriaQuery<Student> cq = cb.createQuery(Student.class);
@@ -83,6 +52,13 @@ public class StudentDaoImpl implements StudentDao {
 
 	    TypedQuery<Student> allQuery = session.createQuery(all);
 	    return allQuery.getResultList();
+	}
+	
+	@Override
+	public Student getStudentById(int id) {
+		// TODO Auto-generated method stub
+		
+		return (Student) session.get(Student.class, id);
 	}
 
 }
